@@ -13,7 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
+import static com.hodolblog.service.PostService.PAGE_SIZE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -123,27 +125,22 @@ class PostControllerTest {
     @DisplayName("글 다건 조회")
     void getMultiPosts() throws Exception {
         // given
-        Post samplePost1 = Post.builder()
-                               .title("title1")
-                               .content("content1")
-                               .build();
-        Post samplePost2 = Post.builder()
-                               .title("title2")
-                               .content("content2")
-                               .build();
-        postRepository.saveAll(List.of(samplePost1, samplePost2));
+        List<Post> requestPosts = IntStream.rangeClosed(1, 30)
+                                           .mapToObj(i -> Post.builder()
+                                                              .title("title " + i)
+                                                              .content("content " + i)
+                                                              .build())
+                                           .toList();
+        postRepository.saveAll(requestPosts);
 
         // when, then
-        mockMvc.perform(get("/posts")
+        mockMvc.perform(get("/posts?page=0&sort=id,desc")
                                 .contentType(APPLICATION_JSON))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.length()").value(2))
-               .andExpect(jsonPath("$[0].id").value(samplePost1.getId()))
-               .andExpect(jsonPath("$[0].title").value(samplePost1.getTitle()))
-               .andExpect(jsonPath("$[0].content").value(samplePost1.getContent()))
-               .andExpect(jsonPath("$[1].id").value(samplePost2.getId()))
-               .andExpect(jsonPath("$[1].title").value(samplePost2.getTitle()))
-               .andExpect(jsonPath("$[1].content").value(samplePost2.getContent()))
+               .andExpect(jsonPath("$.length()").value(PAGE_SIZE))
+                .andExpect(jsonPath("$[0].id").value("30"))
+                .andExpect(jsonPath("$[0].title").value("title 30"))
+                .andExpect(jsonPath("$[0].content").value("content 30"))
                .andDo(print());
     }
 }
