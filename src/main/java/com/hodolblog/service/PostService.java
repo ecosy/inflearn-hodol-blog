@@ -3,6 +3,7 @@ package com.hodolblog.service;
 import com.hodolblog.domain.Post;
 import com.hodolblog.repository.PostRepository;
 import com.hodolblog.request.PostCreate;
+import com.hodolblog.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,9 +25,15 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public Post getPost(Long id) {
+    public PostResponse getPost(Long id) {
         Post post = postRepository.findById(id)
                                   .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글 입니다."));
-        return post;
+
+        PostResponse postResponse = PostResponse.builder()
+                                         .id(post.getId())
+                                         .title(post.getTitle())
+                                         .content(post.getContent())
+                                         .build();
+        return postResponse;
     }
 }
