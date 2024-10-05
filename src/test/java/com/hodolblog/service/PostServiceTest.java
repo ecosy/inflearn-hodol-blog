@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -53,7 +55,7 @@ class PostServiceTest {
         postRepository.save(samplePost);
 
         // when
-        PostResponse postResponse = postService.getPost(samplePost.getId());
+        PostResponse postResponse = postService.getPostById(samplePost.getId());
 
         // then
         assertThat(postResponse).isNotNull();
@@ -72,7 +74,7 @@ class PostServiceTest {
         postRepository.save(samplePost);
 
         // when
-        PostResponse postResponse = postService.getPost(samplePost.getId());
+        PostResponse postResponse = postService.getPostById(samplePost.getId());
 
         // then
         assertThat(postResponse).isNotNull();
@@ -91,7 +93,7 @@ class PostServiceTest {
         postRepository.save(samplePost);
 
         // when
-        PostResponse postResponse = postService.getPost(samplePost.getId());
+        PostResponse postResponse = postService.getPostById(samplePost.getId());
 
         // then
         assertThat(postResponse).isNotNull();
@@ -110,11 +112,32 @@ class PostServiceTest {
         postRepository.save(samplePost);
 
         // when
-        PostResponse postResponse = postService.getPost(samplePost.getId());
+        PostResponse postResponse = postService.getPostById(samplePost.getId());
 
         // then
         assertThat(postResponse).isNotNull();
         assertThat(postResponse.getTitle()).isEqualTo(samplePost.getTitle());
         assertThat(postResponse.getContent()).isEqualTo(samplePost.getContent());
+    }
+
+    @Test
+    @DisplayName("글 다건 조회")
+    void getMultiPosts() {
+        // given
+        Post samplePost1 = Post.builder()
+                              .title("title1")
+                              .content("content1")
+                              .build();
+
+        Post samplePost2 = Post.builder()
+                               .title("title2")
+                               .content("content2")
+                               .build();
+
+        postRepository.saveAll(List.of(samplePost1, samplePost2));
+
+        // when
+        List<PostResponse> posts = postService.getPosts();
+        assertThat(posts).hasSize(2);
     }
 }
