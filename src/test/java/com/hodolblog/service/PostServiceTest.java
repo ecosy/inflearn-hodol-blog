@@ -9,9 +9,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
+import static com.hodolblog.service.PostService.PAGE_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -121,23 +125,24 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("글 다건 조회")
+    @DisplayName("글 다건 조회 - 1 page")
     void getMultiPosts() {
         // given
-        Post samplePost1 = Post.builder()
-                              .title("title1")
-                              .content("content1")
-                              .build();
-
-        Post samplePost2 = Post.builder()
-                               .title("title2")
-                               .content("content2")
-                               .build();
-
-        postRepository.saveAll(List.of(samplePost1, samplePost2));
+        List<Post> requestPosts = IntStream.rangeClosed(1, 30)
+                                           .mapToObj(i -> Post.builder()
+                                                              .title("title " + i)
+                                                              .content("content " + i)
+                                                              .build())
+                                           .toList();
+        postRepository.saveAll(requestPosts);
 
         // when
-        List<PostResponse> posts = postService.getPosts();
-        assertThat(posts).hasSize(2);
+        PageRequest pageRequest = PageRequest.of(0, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "id"));
+        List<PostResponse> posts = postService.getPosts(pageRequest);
+
+        // then
+        assertThat(posts).hasSize(PAGE_SIZE);
+        assertThat(posts.getFirst().getTitle()).isEqualTo("title " + 30);
+        assertThat(posts.getLast().getTitle()).isEqualTo("title " + (30 - PAGE_SIZE + 1));
     }
 }

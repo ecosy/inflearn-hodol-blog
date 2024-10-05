@@ -6,6 +6,7 @@ import com.hodolblog.request.PostCreate;
 import com.hodolblog.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+    public static final int PAGE_SIZE = 5;
+
     private final PostRepository postRepository;
 
     public void write(PostCreate postCreate) {
@@ -36,8 +39,8 @@ public class PostService {
                            .build();
     }
 
-    public List<PostResponse> getPosts() {
-        return postRepository.findAll().stream()
+    public List<PostResponse> getPosts(Pageable pageable) {
+        return postRepository.findAll(pageable).stream()
                              .map(PostResponse::new)
                              .toList();
     }
