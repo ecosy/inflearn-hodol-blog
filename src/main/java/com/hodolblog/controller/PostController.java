@@ -8,26 +8,31 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
 
-    @GetMapping("/posts")
-    public String getPosts() {
+    @GetMapping("/hello-world")
+    public String getHelloWorld() {
         return "hello world!";
     }
 
     @PostMapping("/posts")
     public void post(@RequestBody @Valid PostCreate postCreate) {
-        log.info("params={}", postCreate.toString());
         postService.write(postCreate);
     }
 
     @GetMapping("/posts/{post_id}")
-    public PostResponse getPost(@PathVariable(name = "post_id") Long id) {
-        PostResponse postResponse = postService.getPost(id);
-        return postResponse;
+    public PostResponse getPostById(@PathVariable(name = "post_id") Long id) {
+        return postService.getPostById(id);
+    }
+
+    @GetMapping("/posts")
+    public List<PostResponse> getPosts() {
+        return postService.getPosts();
     }
 }

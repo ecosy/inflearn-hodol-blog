@@ -12,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,7 +37,7 @@ class PostControllerTest {
     @Test
     @DisplayName("/posts 요청시 hello world를 출력한다.")
     void helloWorldPostTest() throws Exception {
-        mockMvc.perform(get("/posts"))
+        mockMvc.perform(get("/hello-world"))
                .andExpect(status().isOk())
                .andExpect(content().string("hello world!"))
                .andDo(print()); // request, response에 대한 요약을 보여준다.
@@ -54,7 +56,7 @@ class PostControllerTest {
                                 .content(json))
                .andExpect(status().isOk())
                .andExpect(content().string(""))
-               .andDo(print()); // request, response에 대한 요약을 보여준다.    }
+               .andDo(print()); // request, response에 대한 요약을 보여준다.
     }
 
     @Test
@@ -72,7 +74,7 @@ class PostControllerTest {
                .andExpect(jsonPath("$.code").value("400"))
                .andExpect(jsonPath("$.message").value("잘못된 요청 입니다."))
                .andExpect(jsonPath("$.validation.title").value("타이틀을 입력해주세요."))
-               .andDo(print()); // request, response에 대한 요약을 보여준다.    }
+               .andDo(print()); // request, response에 대한 요약을 보여준다.
     }
 
     @Test
@@ -87,7 +89,7 @@ class PostControllerTest {
                                 .contentType(APPLICATION_JSON)
                                 .content(json))
                .andExpect(status().isOk())
-               .andDo(print()); // request, response에 대한 요약을 보여준다.    }
+               .andDo(print()); // request, response에 대한 요약을 보여준다.
 
         // then
         assertThat(postRepository.count()).isEqualTo(1L);
@@ -114,6 +116,34 @@ class PostControllerTest {
                .andExpect(jsonPath("$.id").value(samplePost.getId()))
                .andExpect(jsonPath("$.title").value(samplePost.getTitle()))
                .andExpect(jsonPath("$.content").value(samplePost.getContent()))
+               .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 다건 조회")
+    void getMultiPosts() throws Exception {
+        // given
+        Post samplePost1 = Post.builder()
+                               .title("title1")
+                               .content("content1")
+                               .build();
+        Post samplePost2 = Post.builder()
+                               .title("title2")
+                               .content("content2")
+                               .build();
+        postRepository.saveAll(List.of(samplePost1, samplePost2));
+
+        // when, then
+        mockMvc.perform(get("/posts")
+                                .contentType(APPLICATION_JSON))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.length()").value(2))
+               .andExpect(jsonPath("$[0].id").value(samplePost1.getId()))
+               .andExpect(jsonPath("$[0].title").value(samplePost1.getTitle()))
+               .andExpect(jsonPath("$[0].content").value(samplePost1.getContent()))
+               .andExpect(jsonPath("$[1].id").value(samplePost2.getId()))
+               .andExpect(jsonPath("$[1].title").value(samplePost2.getTitle()))
+               .andExpect(jsonPath("$[1].content").value(samplePost2.getContent()))
                .andDo(print());
     }
 }
