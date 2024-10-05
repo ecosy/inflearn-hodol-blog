@@ -1,7 +1,7 @@
 package com.hodolblog.controller;
 
-import com.hodolblog.domain.Post;
 import com.hodolblog.request.PostCreate;
+import com.hodolblog.response.PostResponse;
 import com.hodolblog.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +26,8 @@ public class PostController {
     }
 
     @GetMapping("/posts/{post_id}")
-    public Post getPost(@PathVariable(name = "post_id") Long id) {
-        Post post = postService.getPost(id);
-        return post;
+    public PostResponse getPost(@PathVariable(name = "post_id") Long id) {
+        PostResponse postResponse = postService.getPost(id);
+        return postResponse;
     }
 }

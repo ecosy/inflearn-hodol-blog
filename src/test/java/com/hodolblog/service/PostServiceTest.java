@@ -3,6 +3,7 @@ package com.hodolblog.service;
 import com.hodolblog.domain.Post;
 import com.hodolblog.repository.PostRepository;
 import com.hodolblog.request.PostCreate;
+import com.hodolblog.response.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,11 +53,68 @@ class PostServiceTest {
         postRepository.save(samplePost);
 
         // when
-        Post savedPost = postService.getPost(samplePost.getId());
+        PostResponse postResponse = postService.getPost(samplePost.getId());
 
         // then
-        assertThat(savedPost).isNotNull();
-        assertThat(savedPost.getTitle()).isEqualTo(samplePost.getTitle());
-        assertThat(savedPost.getContent()).isEqualTo(samplePost.getContent());
+        assertThat(postResponse).isNotNull();
+        assertThat(postResponse.getTitle()).isEqualTo(samplePost.getTitle());
+        assertThat(postResponse.getContent()).isEqualTo(samplePost.getContent());
+    }
+
+    @Test
+    @DisplayName("글 1개 조회 - 제목이 TITLE_MAX_LENGTH 글자 이상인 경우 10글자만 조회 확인")
+    void getOnePost_whenTitleLengthMoreThanMax() {
+        // given
+        Post samplePost = Post.builder()
+                              .title("t".repeat(PostResponse.TITLE_MAX_LENGTH + 1))
+                              .content("content")
+                              .build();
+        postRepository.save(samplePost);
+
+        // when
+        PostResponse postResponse = postService.getPost(samplePost.getId());
+
+        // then
+        assertThat(postResponse).isNotNull();
+        assertThat(postResponse.getTitle()).isEqualTo(samplePost.getTitle().substring(0, PostResponse.TITLE_MAX_LENGTH));
+        assertThat(postResponse.getContent()).isEqualTo(samplePost.getContent());
+    }
+
+    @Test
+    @DisplayName("글 1개 조회 - 제목이 TITLE_MAX_LENGTH 글자 미만인 경우, 해당 글자 수 만큼 조회 확인")
+    void getOnePost_whenTitleLengthLessThanMax() {
+        // given
+        Post samplePost = Post.builder()
+                              .title("t".repeat(PostResponse.TITLE_MAX_LENGTH - 1))
+                              .content("content")
+                              .build();
+        postRepository.save(samplePost);
+
+        // when
+        PostResponse postResponse = postService.getPost(samplePost.getId());
+
+        // then
+        assertThat(postResponse).isNotNull();
+        assertThat(postResponse.getTitle()).isEqualTo(samplePost.getTitle());
+        assertThat(postResponse.getContent()).isEqualTo(samplePost.getContent());
+    }
+
+    @Test
+    @DisplayName("글 1개 조회 - 제목이 TITLE_MAX_LENGTH 글자 수 동일한 경우, 해당 글자 수 만큼 조회 확인")
+    void getOnePost_whenTitleLengthEqualToMax() {
+        // given
+        Post samplePost = Post.builder()
+                              .title("t".repeat(PostResponse.TITLE_MAX_LENGTH))
+                              .content("content")
+                              .build();
+        postRepository.save(samplePost);
+
+        // when
+        PostResponse postResponse = postService.getPost(samplePost.getId());
+
+        // then
+        assertThat(postResponse).isNotNull();
+        assertThat(postResponse.getTitle()).isEqualTo(samplePost.getTitle());
+        assertThat(postResponse.getContent()).isEqualTo(samplePost.getContent());
     }
 }
