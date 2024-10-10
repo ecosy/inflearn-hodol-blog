@@ -3,10 +3,10 @@ package com.hodolblog.service;
 import com.hodolblog.domain.Post;
 import com.hodolblog.repository.PostRepository;
 import com.hodolblog.request.PostCreate;
+import com.hodolblog.request.PostSearch;
 import com.hodolblog.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +15,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostService {
-    public static final int PAGE_SIZE = 5;
 
     private final PostRepository postRepository;
 
@@ -39,9 +38,15 @@ public class PostService {
                            .build();
     }
 
-    public List<PostResponse> getPosts(Pageable pageable) {
-        return postRepository.findAll(pageable).stream()
-                             .map(PostResponse::new)
-                             .toList();
+    public List<PostResponse> getPosts(PostSearch postSearch) {
+        return postRepository.getPosts(postSearch).stream()
+                      .map(PostResponse::new)
+                      .toList();
     }
+
+//    public void editPost(Long postId, PostEdit postEdit) {
+//        postRepository.findById(postId)
+//                      .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글 입니다"));
+//
+//    }
 }

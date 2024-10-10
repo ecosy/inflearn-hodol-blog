@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.hodolblog.service.PostService.PAGE_SIZE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -134,13 +133,37 @@ class PostControllerTest {
         postRepository.saveAll(requestPosts);
 
         // when, then
-        mockMvc.perform(get("/posts?page=0&sort=id,desc")
+        int testPageSize = 10;
+        mockMvc.perform(get("/posts?page=1&size={size}", testPageSize)
                                 .contentType(APPLICATION_JSON))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.length()").value(PAGE_SIZE))
-                .andExpect(jsonPath("$[0].id").value("30"))
-                .andExpect(jsonPath("$[0].title").value("title 30"))
-                .andExpect(jsonPath("$[0].content").value("content 30"))
+               .andExpect(jsonPath("$.length()").value(testPageSize))
+               .andExpect(jsonPath("$[0].title").value("title 30"))
+               .andExpect(jsonPath("$[0].content").value("content 30"))
+               .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 다건 조회 - page를 0 으로 오류 입력한 경우, 정상적으로 호출되는가?")
+    void getMultiPosts2() throws Exception {
+        // given
+        List<Post> requestPosts = IntStream.rangeClosed(1, 30)
+                                           .mapToObj(i -> Post.builder()
+                                                              .title("title " + i)
+                                                              .content("content " + i)
+                                                              .build())
+                                           .toList();
+        postRepository.saveAll(requestPosts);
+
+        // when, then
+        int testPage = 0;
+        int testPageSize = 10;
+        mockMvc.perform(get("/posts?page={page}&size={size}", testPage, testPageSize)
+                                .contentType(APPLICATION_JSON))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.length()").value(testPageSize))
+               .andExpect(jsonPath("$[0].title").value("title 30"))
+               .andExpect(jsonPath("$[0].content").value("content 30"))
                .andDo(print());
     }
 }

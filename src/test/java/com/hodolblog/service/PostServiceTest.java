@@ -3,19 +3,17 @@ package com.hodolblog.service;
 import com.hodolblog.domain.Post;
 import com.hodolblog.repository.PostRepository;
 import com.hodolblog.request.PostCreate;
+import com.hodolblog.request.PostSearch;
 import com.hodolblog.response.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.hodolblog.service.PostService.PAGE_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -137,12 +135,33 @@ class PostServiceTest {
         postRepository.saveAll(requestPosts);
 
         // when
-        PageRequest pageRequest = PageRequest.of(0, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "id"));
-        List<PostResponse> posts = postService.getPosts(pageRequest);
+        int testPage = 2;
+        PostSearch postSearch = PostSearch.builder()
+                                          .page(testPage)
+                                          .build();
+        List<PostResponse> posts = postService.getPosts(postSearch);
 
         // then
-        assertThat(posts).hasSize(PAGE_SIZE);
-        assertThat(posts.getFirst().getTitle()).isEqualTo("title " + 30);
-        assertThat(posts.getLast().getTitle()).isEqualTo("title " + (30 - PAGE_SIZE + 1));
+        assertThat(posts).hasSize(postSearch.getSize());
+        assertThat(posts.getFirst().getTitle()).isEqualTo("title " + (30 - postSearch.getSize() * (testPage - 1)));
+        assertThat(posts.getLast().getTitle()).isEqualTo("title " + (30 - (postSearch.getSize() * testPage ) + 1));
     }
+
+//    @Test
+//    @DisplayName("글 제목 수정")
+//    void editPostTitle(){
+//        // given
+//        Post post = Post.builder()
+//                        .title("updated title")
+//                        .content("updated content")
+//                        .build();
+//        postRepository.save(post);
+//
+//        // when
+//        PostEdit
+//        postService.editPost(post.getId(), );
+//
+//        // then
+//
+//    }
 }

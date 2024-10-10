@@ -1,12 +1,12 @@
 package com.hodolblog.controller;
 
 import com.hodolblog.request.PostCreate;
+import com.hodolblog.request.PostSearch;
 import com.hodolblog.response.PostResponse;
 import com.hodolblog.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public List<PostResponse> getPosts(Pageable page) {
-        return postService.getPosts(page);
+    public List<PostResponse> getPosts(@ModelAttribute PostSearch postSearch) {
+        return postService.getPosts(postSearch);
     }
 }
