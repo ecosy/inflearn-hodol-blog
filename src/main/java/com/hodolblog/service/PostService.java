@@ -52,10 +52,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
                                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글 입니다"));
 
-        PostEditor.PostEditorBuilder editorBuilder = post.toEditor();
-        PostEditor postEditor = editorBuilder.title(postEditRequest.getTitle())
-                                             .content(post.getContent())
-                                             .build();
+        PostEditor postEditor = PostEditor.of(postEditRequest);
         post.edit(postEditor);
         postRepository.save(post);
     }

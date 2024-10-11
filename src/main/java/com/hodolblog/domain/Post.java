@@ -1,7 +1,10 @@
 package com.hodolblog.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -20,11 +23,5 @@ public class Post {
     public void edit(PostEditor postEditor) {
         this.title = postEditor.getTitle();
         this.content = postEditor.getContent();
-    }
-
-    public PostEditor.PostEditorBuilder toEditor() {
-        return PostEditor.builder()
-                        .title(this.title)
-                        .content(this.content);
     }
 }
