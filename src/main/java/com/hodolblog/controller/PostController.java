@@ -1,6 +1,6 @@
 package com.hodolblog.controller;
 
-import com.hodolblog.request.PostCreate;
+import com.hodolblog.request.PostCreateRequest;
 import com.hodolblog.request.PostSearch;
 import com.hodolblog.response.PostResponse;
 import com.hodolblog.service.PostService;
@@ -23,8 +23,8 @@ public class PostController {
     }
 
     @PostMapping("/posts")
-    public void post(@RequestBody @Valid PostCreate postCreate) {
-        postService.write(postCreate);
+    public void post(@RequestBody @Valid PostCreateRequest postCreateRequest) {
+        postService.write(postCreateRequest);
     }
 
     @GetMapping("/posts/{post_id}")

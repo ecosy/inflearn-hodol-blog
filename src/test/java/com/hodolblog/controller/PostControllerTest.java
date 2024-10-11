@@ -3,7 +3,7 @@ package com.hodolblog.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hodolblog.domain.Post;
 import com.hodolblog.repository.PostRepository;
-import com.hodolblog.request.PostCreate;
+import com.hodolblog.request.PostCreateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class PostControllerTest {
     @DisplayName("POST basic test")
     void postBasicRequestTest() throws Exception {
         // given
-        PostCreate request = PostCreate.of("제목 입니다.", "글 내용 입니다.");
+        PostCreateRequest request = PostCreateRequest.of("제목 입니다.", "글 내용 입니다.");
         String json = objectMapper.writeValueAsString(request);
 
         // when, then
@@ -64,7 +64,7 @@ class PostControllerTest {
     @DisplayName("/posts 요청시 title 값은 필수다.")
     void validateTitleNullWhenPosts() throws Exception {
         // given
-        PostCreate request = PostCreate.of(null, "글 내용 입니다.");
+        PostCreateRequest request = PostCreateRequest.of(null, "글 내용 입니다.");
         String json = objectMapper.writeValueAsString(request);
 
         // when, then
@@ -82,7 +82,7 @@ class PostControllerTest {
     @DisplayName("/posts 요청시 DB에 값이 저장된다.")
     void savePostDB() throws Exception {
         // given
-        PostCreate request = PostCreate.of("제목 입니다.", "글 내용 입니다.");
+        PostCreateRequest request = PostCreateRequest.of("제목 입니다.", "글 내용 입니다.");
         String json = objectMapper.writeValueAsString(request);
 
         // when

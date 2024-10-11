@@ -8,8 +8,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 @Builder
-@Getter
-@Setter
+@Getter@Setter
 public class PostSearch {
     private static final int MAX_SIZE = 2000;
     @Builder.Default private int page = 1;

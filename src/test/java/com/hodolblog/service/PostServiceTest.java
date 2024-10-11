@@ -2,7 +2,8 @@ package com.hodolblog.service;
 
 import com.hodolblog.domain.Post;
 import com.hodolblog.repository.PostRepository;
-import com.hodolblog.request.PostCreate;
+import com.hodolblog.request.PostCreateRequest;
+import com.hodolblog.request.PostEditRequest;
 import com.hodolblog.request.PostSearch;
 import com.hodolblog.response.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,18 +32,18 @@ class PostServiceTest {
     @DisplayName("글 작성 테스트")
     void test1() {
         // given
-        PostCreate postCreate = PostCreate.builder()
-                                          .title("제목 입니다.")
-                                          .content("내용 입니다.")
-                                          .build();
+        PostCreateRequest postCreateRequest = PostCreateRequest.builder()
+                                                               .title("제목 입니다.")
+                                                               .content("내용 입니다.")
+                                                               .build();
         // when
-        postService.write(postCreate);
+        postService.write(postCreateRequest);
 
         // then
         assertThat(postRepository.count()).isEqualTo(1L);
         Post post = postRepository.findAll().getFirst();
-        assertThat(post.getTitle()).isEqualTo(postCreate.getTitle());
-        assertThat(post.getContent()).isEqualTo(postCreate.getContent());
+        assertThat(post.getTitle()).isEqualTo(postCreateRequest.getTitle());
+        assertThat(post.getContent()).isEqualTo(postCreateRequest.getContent());
     }
 
 
@@ -147,21 +148,53 @@ class PostServiceTest {
         assertThat(posts.getLast().getTitle()).isEqualTo("title " + (30 - (postSearch.getSize() * testPage ) + 1));
     }
 
-//    @Test
-//    @DisplayName("글 제목 수정")
-//    void editPostTitle(){
-//        // given
-//        Post post = Post.builder()
-//                        .title("updated title")
-//                        .content("updated content")
-//                        .build();
-//        postRepository.save(post);
-//
-//        // when
-//        PostEdit
-//        postService.editPost(post.getId(), );
-//
-//        // then
-//
-//    }
+    @Test
+    @DisplayName("글 제목 수정")
+    void editPostTitle(){
+        // given
+        Post originalPost = Post.builder()
+                        .title("original title")
+                        .content("original content")
+                        .build();
+        postRepository.save(originalPost);
+
+        // when
+        PostEditRequest editedPost = PostEditRequest.builder()
+                                                    .postId(originalPost.getId())
+                                                    .title("updated title")
+                                                    .build();
+        postService.editPost(originalPost.getId(), editedPost);
+
+        // then
+        Post updatedPost = postRepository.findById(originalPost.getId())
+                                         .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id : " + originalPost.getId()));
+
+        assertThat(updatedPost.getId()).isEqualTo(originalPost.getId());
+        assertThat(updatedPost.getTitle()).isEqualTo(editedPost.getTitle());
+    }
+
+    @Test
+    @DisplayName("글 내용 수정")
+    void editPostContent(){
+        // given
+        Post originalPost = Post.builder()
+                                .title("original title")
+                                .content("original content")
+                                .build();
+        postRepository.save(originalPost);
+
+        // when
+        PostEditRequest editedPost = PostEditRequest.builder()
+                                                    .postId(originalPost.getId())
+                                                    .content("updated content")
+                                                    .build();
+        postService.editPost(originalPost.getId(), editedPost);
+
+        // then
+        Post updatedPost = postRepository.findById(originalPost.getId())
+                                         .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id : " + originalPost.getId()));
+
+        assertThat(updatedPost.getId()).isEqualTo(originalPost.getId());
+        assertThat(updatedPost.getContent()).isEqualTo(editedPost.getContent());
+    }
 }
