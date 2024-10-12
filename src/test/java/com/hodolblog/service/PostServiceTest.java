@@ -1,6 +1,7 @@
 package com.hodolblog.service;
 
 import com.hodolblog.domain.Post;
+import com.hodolblog.exception.PostNotFound;
 import com.hodolblog.repository.PostRepository;
 import com.hodolblog.request.PostCreateRequest;
 import com.hodolblog.request.PostEditRequest;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class PostServiceTest {
@@ -37,7 +39,7 @@ class PostServiceTest {
                                                                .content("내용 입니다.")
                                                                .build();
         // when
-        postService.write(postCreateRequest);
+        postService.createPost(postCreateRequest);
 
         // then
         assertThat(postRepository.count()).isEqualTo(1L);
@@ -64,6 +66,23 @@ class PostServiceTest {
         assertThat(postResponse).isNotNull();
         assertThat(postResponse.getTitle()).isEqualTo(samplePost.getTitle());
         assertThat(postResponse.getContent()).isEqualTo(samplePost.getContent());
+    }
+
+    @Test
+    @DisplayName("글 1개 조회 - PostNotFound 예외 테스트")
+    void getOnePostTest_whenException() {
+        // given
+        Post samplePost = Post.builder()
+                              .title("title")
+                              .content("content")
+                              .build();
+        postRepository.save(samplePost);
+
+        // when, then
+        Long errorPostId = samplePost.getId() + 1;
+        assertThatThrownBy(() -> postService.getPostById(errorPostId))
+                .isInstanceOf(PostNotFound.class)
+                .hasMessage(PostNotFound.MESSAGE);
     }
 
     @Test
@@ -197,6 +216,30 @@ class PostServiceTest {
     }
 
     @Test
+    @DisplayName("글 내용 수정 - PostNotFoundException 예외 테스트")
+    void editPostContent_whenPostNotFoundException() {
+        // given
+        Post originalPost = Post.builder()
+                                .title("original title")
+                                .content("original content")
+                                .build();
+        postRepository.save(originalPost);
+
+        // when
+        PostEditRequest editedPost = PostEditRequest.builder()
+                                                    .content("updated content")
+                                                    .build();
+        postService.editPost(originalPost.getId(), editedPost);
+
+        // when, then
+        Long errorPostId = originalPost.getId() + 1;
+        assertThatThrownBy(() -> postService.editPost(errorPostId, editedPost))
+                .isInstanceOf(PostNotFound.class)
+                .hasMessage(PostNotFound.MESSAGE);
+    }
+
+
+    @Test
     @DisplayName("게시글 삭제")
     void deletePostTest() {
         // given
@@ -211,5 +254,22 @@ class PostServiceTest {
 
         // then
         assertThat(postRepository.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 - PostNotFoundException 예외 테스트")
+    void deletePostTest_whenPageNotFoundException() {
+        // given
+        Post post = Post.builder()
+                        .title("title")
+                        .content("content")
+                        .build();
+        postRepository.save(post);
+
+        // when, then
+        Long errorPostId = post.getId() + 1;
+        assertThatThrownBy(() -> postService.deletePost(errorPostId))
+                .isInstanceOf(PostNotFound.class)
+                .hasMessage(PostNotFound.MESSAGE);
     }
 }

@@ -2,6 +2,7 @@ package com.hodolblog.service;
 
 import com.hodolblog.domain.Post;
 import com.hodolblog.domain.PostEditor;
+import com.hodolblog.exception.PostNotFound;
 import com.hodolblog.repository.PostRepository;
 import com.hodolblog.request.PostCreateRequest;
 import com.hodolblog.request.PostEditRequest;
@@ -21,7 +22,7 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    public void write(PostCreateRequest postCreateRequest) {
+    public void createPost(PostCreateRequest postCreateRequest) {
         Post post = Post.builder()
                         .title(postCreateRequest.title)
                         .content(postCreateRequest.content)
@@ -32,7 +33,7 @@ public class PostService {
 
     public PostResponse getPostById(Long id) {
         Post post = postRepository.findById(id)
-                                  .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글 입니다."));
+                                  .orElseThrow(PostNotFound::new);
 
         return PostResponse.builder()
                            .id(post.getId())
@@ -50,7 +51,7 @@ public class PostService {
     @Transactional
     public void editPost(Long postId, PostEditRequest postEditRequest) {
         Post post = postRepository.findById(postId)
-                                           .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글 입니다"));
+                                           .orElseThrow(PostNotFound::new);
 
         PostEditor postEditor = PostEditor.of(postEditRequest);
         post.edit(postEditor);
@@ -60,7 +61,7 @@ public class PostService {
     @Transactional
     public void deletePost(Long id) {
         Post post = postRepository.findById(id)
-                                  .orElseThrow(() -> new IllegalArgumentException(("존재하지 않는 글 입니다.")));
+                                  .orElseThrow(PostNotFound::new);
         postRepository.delete(post);
     }
 }

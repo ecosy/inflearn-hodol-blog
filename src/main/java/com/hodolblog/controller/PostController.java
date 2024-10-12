@@ -25,7 +25,7 @@ public class PostController {
 
     @PostMapping("/posts")
     public void post(@RequestBody @Valid PostCreateRequest postCreateRequest) {
-        postService.write(postCreateRequest);
+        postService.createPost(postCreateRequest);
     }
 
     @GetMapping("/posts/{post_id}")
