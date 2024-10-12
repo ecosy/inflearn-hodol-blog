@@ -145,17 +145,17 @@ class PostServiceTest {
         // then
         assertThat(posts).hasSize(postSearch.getSize());
         assertThat(posts.getFirst().getTitle()).isEqualTo("title " + (30 - postSearch.getSize() * (testPage - 1)));
-        assertThat(posts.getLast().getTitle()).isEqualTo("title " + (30 - (postSearch.getSize() * testPage ) + 1));
+        assertThat(posts.getLast().getTitle()).isEqualTo("title " + (30 - (postSearch.getSize() * testPage) + 1));
     }
 
     @Test
     @DisplayName("글 제목 수정")
-    void editPostTitle(){
+    void editPostTitle() {
         // given
         Post originalPost = Post.builder()
-                        .title("original title")
-                        .content("original content")
-                        .build();
+                                .title("original title")
+                                .content("original content")
+                                .build();
         postRepository.save(originalPost);
 
         // when
@@ -174,7 +174,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 내용 수정")
-    void editPostContent(){
+    void editPostContent() {
         // given
         Post originalPost = Post.builder()
                                 .title("original title")
@@ -194,5 +194,22 @@ class PostServiceTest {
 
         assertThat(updatedPost.getId()).isEqualTo(originalPost.getId());
         assertThat(updatedPost.getContent()).isEqualTo(editedPost.getContent());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    void deletePostTest() {
+        // given
+        Post post = Post.builder()
+                         .title("title")
+                         .content("content")
+                         .build();
+        postRepository.save(post);
+
+        // when
+        postService.deletePost(post.getId());
+
+        // then
+        assertThat(postRepository.count()).isZero();
     }
 }
