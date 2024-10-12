@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -21,7 +23,7 @@ public class Post {
     }
 
     public void edit(PostEditor postEditor) {
-        this.title = postEditor.getTitle();
-        this.content = postEditor.getContent();
+        Optional.ofNullable(postEditor.getTitle()).ifPresent(updatedTitle -> this.title = updatedTitle);
+        Optional.ofNullable(postEditor.getContent()).ifPresent(updatedContent -> this.content = updatedContent);
     }
 }

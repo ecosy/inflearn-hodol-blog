@@ -4,8 +4,6 @@ import com.hodolblog.request.PostEditRequest;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Optional;
-
 @Getter
 public class PostEditor {
     private final String title;
@@ -18,11 +16,9 @@ public class PostEditor {
     }
 
     public static PostEditor of(PostEditRequest postEditRequest) {
-        PostEditorBuilder builder = PostEditor.builder();
-
-        Optional.ofNullable(postEditRequest.getTitle()).ifPresent(builder::title);
-        Optional.ofNullable(postEditRequest.getContent()).ifPresent(builder::content);
-
-        return builder.build();
+        return PostEditor.builder()
+                         .title(postEditRequest.getTitle())
+                         .content(postEditRequest.getContent())
+                         .build();
     }
 }
