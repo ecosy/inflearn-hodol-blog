@@ -160,7 +160,6 @@ class PostServiceTest {
 
         // when
         PostEditRequest editedPost = PostEditRequest.builder()
-                                                    .postId(originalPost.getId())
                                                     .title("updated title")
                                                     .build();
         postService.editPost(originalPost.getId(), editedPost);
@@ -185,7 +184,6 @@ class PostServiceTest {
 
         // when
         PostEditRequest editedPost = PostEditRequest.builder()
-                                                    .postId(originalPost.getId())
                                                     .content("updated content")
                                                     .build();
         postService.editPost(originalPost.getId(), editedPost);

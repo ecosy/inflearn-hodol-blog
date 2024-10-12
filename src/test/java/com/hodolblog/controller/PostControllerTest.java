@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hodolblog.domain.Post;
 import com.hodolblog.repository.PostRepository;
 import com.hodolblog.request.PostCreateRequest;
+import com.hodolblog.request.PostEditRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -164,6 +164,29 @@ class PostControllerTest {
                .andExpect(jsonPath("$.length()").value(testPageSize))
                .andExpect(jsonPath("$[0].title").value("title 30"))
                .andExpect(jsonPath("$[0].content").value("content 30"))
+               .andDo(print());
+    }
+
+    @Test
+    @DisplayName("post 수정 테스트")
+    void editPostTest() throws Exception {
+        // given
+        Post post = Post.builder()
+                        .title("title")
+                        .content("content")
+                        .build();
+        postRepository.save(post);
+
+        PostEditRequest postEditRequest = PostEditRequest.builder()
+                                                         .title("updated title")
+                                                         .content("updated content")
+                                                         .build();
+
+        // when, then
+        mockMvc.perform(patch("/posts/{post_id}", post.getId())
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(postEditRequest)))
+               .andExpect(status().isOk())
                .andDo(print());
     }
 }
