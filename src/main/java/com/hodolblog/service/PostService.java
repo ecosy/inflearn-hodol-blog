@@ -2,7 +2,7 @@ package com.hodolblog.service;
 
 import com.hodolblog.domain.Post;
 import com.hodolblog.domain.PostEditor;
-import com.hodolblog.exception.PostNotFound;
+import com.hodolblog.exception.PostNotFoundException;
 import com.hodolblog.repository.PostRepository;
 import com.hodolblog.request.PostCreateRequest;
 import com.hodolblog.request.PostEditRequest;
@@ -33,7 +33,7 @@ public class PostService {
 
     public PostResponse getPostById(Long id) {
         Post post = postRepository.findById(id)
-                                  .orElseThrow(PostNotFound::new);
+                                  .orElseThrow(PostNotFoundException::new);
 
         return PostResponse.builder()
                            .id(post.getId())
@@ -51,7 +51,7 @@ public class PostService {
     @Transactional
     public void editPost(Long postId, PostEditRequest postEditRequest) {
         Post post = postRepository.findById(postId)
-                                           .orElseThrow(PostNotFound::new);
+                                           .orElseThrow(PostNotFoundException::new);
 
         PostEditor postEditor = PostEditor.of(postEditRequest);
         post.edit(postEditor);
@@ -61,7 +61,7 @@ public class PostService {
     @Transactional
     public void deletePost(Long id) {
         Post post = postRepository.findById(id)
-                                  .orElseThrow(PostNotFound::new);
+                                  .orElseThrow(PostNotFoundException::new);
         postRepository.delete(post);
     }
 }

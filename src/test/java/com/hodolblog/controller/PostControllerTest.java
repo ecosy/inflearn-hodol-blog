@@ -206,4 +206,81 @@ class PostControllerTest {
                .andExpect(status().isOk())
                .andDo(print());
     }
+
+    @Test
+    @DisplayName("존재하지 않는 post 조회  - 404 응답 테스트")
+    void getPost_whenNotExistPost() throws Exception {
+        // given
+        Post post = Post.builder()
+                        .title("title")
+                        .content("content")
+                        .build();
+        postRepository.save(post);
+
+        // when, then
+        Long errorPostId = post.getId() + 1;
+        mockMvc.perform(get("/posts/{post_id}", errorPostId)
+                                .contentType(APPLICATION_JSON))
+               .andExpect(status().isNotFound())
+               .andDo(print());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 post 수정 - 404 응답 테스트")
+    void editPost_whenNotExistPost() throws Exception {
+        // given
+        Post post = Post.builder()
+                        .title("title")
+                        .content("content")
+                        .build();
+        postRepository.save(post);
+
+        PostEditRequest postEditRequest = PostEditRequest.builder()
+                                                         .title("updated title")
+                                                         .content("updated content")
+                                                         .build();
+
+        // when, then
+        Long errorPostId = post.getId() + 1;
+        mockMvc.perform(patch("/posts/{post_id}", errorPostId)
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(postEditRequest)))
+               .andExpect(status().isNotFound())
+               .andDo(print());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 post 삭제 - 404 응답 테스트")
+    void deletePostTest_whenNotExistPost() throws Exception {
+        // given
+        Post post = Post.builder()
+                        .title("title")
+                        .content("content")
+                        .build();
+        postRepository.save(post);
+
+        // when, then
+        Long errorPostId = post.getId() + 1;
+        mockMvc.perform(delete("/posts/{post_id}", errorPostId)
+                                .contentType(APPLICATION_JSON))
+               .andExpect(status().isNotFound())
+               .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외처리 하고 싶은 단어가 제목에 포함된 경우")
+    void createPostTest_whenBadWordContainedInTitle() throws Exception {
+        // given
+        Post post = Post.builder()
+                        .title("title" + "바보")
+                        .content("content")
+                        .build();
+
+        // when, then
+        mockMvc.perform(post("/posts")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(post)))
+               .andExpect(status().isBadRequest())
+               .andDo(print());
+    }
 }

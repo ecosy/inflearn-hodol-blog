@@ -1,7 +1,7 @@
 package com.hodolblog.service;
 
 import com.hodolblog.domain.Post;
-import com.hodolblog.exception.PostNotFound;
+import com.hodolblog.exception.PostNotFoundException;
 import com.hodolblog.repository.PostRepository;
 import com.hodolblog.request.PostCreateRequest;
 import com.hodolblog.request.PostEditRequest;
@@ -81,8 +81,8 @@ class PostServiceTest {
         // when, then
         Long errorPostId = samplePost.getId() + 1;
         assertThatThrownBy(() -> postService.getPostById(errorPostId))
-                .isInstanceOf(PostNotFound.class)
-                .hasMessage(PostNotFound.MESSAGE);
+                .isInstanceOf(PostNotFoundException.class)
+                .hasMessage(PostNotFoundException.MESSAGE);
     }
 
     @Test
@@ -234,8 +234,8 @@ class PostServiceTest {
         // when, then
         Long errorPostId = originalPost.getId() + 1;
         assertThatThrownBy(() -> postService.editPost(errorPostId, editedPost))
-                .isInstanceOf(PostNotFound.class)
-                .hasMessage(PostNotFound.MESSAGE);
+                .isInstanceOf(PostNotFoundException.class)
+                .hasMessage(PostNotFoundException.MESSAGE);
     }
 
 
@@ -269,7 +269,7 @@ class PostServiceTest {
         // when, then
         Long errorPostId = post.getId() + 1;
         assertThatThrownBy(() -> postService.deletePost(errorPostId))
-                .isInstanceOf(PostNotFound.class)
-                .hasMessage(PostNotFound.MESSAGE);
+                .isInstanceOf(PostNotFoundException.class)
+                .hasMessage(PostNotFoundException.MESSAGE);
     }
 }
